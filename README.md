@@ -89,3 +89,333 @@ El objetivo del proyecto es representar de manera interactiva la presión psicol
 
 ---
 # Link p5.js (https://editor.p5js.org/whomvtiass/sketches/nq6oeUJ6c)
+
+# CODIGO COMPLETO 
+let textoImg; // guarda imagen del texto
+let mujer; // guarda imagen mujer
+let fondoParpadeo; // guarda fondo que parpadea
+let imagenInferior; // guarda imagen inferior
+let sonido; // sonido de fondo
+//VARIABLES 
+let textoActivo = true; // controla si texto aparece
+let mujerVisible = false; // controla aparición mujer
+let cuadradoVisible = false; // controla cuadrado
+let mensajeVisible = false; // controla mensaje
+
+//EXPLOSIÓN 
+let explotar = false; // activa triángulos
+
+//PARPADEO 
+let parpadeoTexto = true; // controla parpadeo texto
+
+//TRIÁNGULOS 
+let triangulos = []; // arreglo donde se guardan triángulo
+
+//PRELOAD 
+function preload() {
+  textoImg = loadImage("texto.png"); // carga imagen texto
+  mujer = loadImage("mujer.png"); // carga imagen mujer
+  fondoParpadeo = loadImage("fondo.png"); // carga imagen fondo
+  imagenInferior = loadImage("inferior.png"); // carga imagen inferior
+  sonido = loadSound("sonido.mp3"); // cambia el nombre por el de tu archivo
+}
+
+//SETUP
+function setup() {
+  createCanvas(windowWidth, windowHeight); // crea un canvas que ocupa todo el tamaño de la ventana del navegador
+  imageMode(CENTER); // centra imágenes
+  rectMode(CENTER); // centra rectángulos
+  noStroke(); // elimina bordes
+}
+function windowResized(){
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+//DRAW 
+function draw() {
+  background(0); // fondo negro
+
+  //DETECTAR MOUSE
+  let mouseDentro = // detecta si mouse está dentro
+    mouseX > 0 && // mouse mayor a 0 en x
+    mouseX < width && // mouse menor al ancho
+    mouseY > 0 && // mouse mayor a 0 en y
+    mouseY < height; // mouse menor al alto
+
+  //REINICIAR SI EL MOUSE SALE DURANTE LA EXPLOSIÓN
+if (explotar && !mouseDentro) {
+  reiniciar();
+  return;
+}
+
+  //FONDO PARPADEANTE
+  let mostrarFondo = true; // controla fondo
+  if (!mouseDentro) { // si mouse está fuera
+    if (frameCount % 4 < 2) { // crea parpadeo
+      mostrarFondo = true; // muestra fondo
+    } else {
+      mostrarFondo = false; // oculta fondo
+    }
+  }
+  else {
+    mostrarFondo = true; // deja fondo fijo
+  }
+  if (mostrarFondo && textoActivo) { // dibuja fondo
+    push(); // guarda configuración
+    let ratioFondo = fondoParpadeo.width / fondoParpadeo.height; // calcula proporción
+    let fondoW = width; // ancho fondo
+    let fondoH = fondoW / ratioFondo; // alto proporcional
+    if (fondoH < height) { // si altura es pequeña
+      fondoH = height; // ajusta altura
+      fondoW = fondoH * ratioFondo; // recalcula ancho
+    }
+ image(
+      fondoParpadeo, // imagen
+      width / 2, // posición x
+      height / 2, // posición y
+      fondoW, // ancho
+      fondoH // alto
+    );
+    pop(); // restaura configuración
+  }
+
+  //CÍRCULO CENTRAL
+  if (!mouseDentro) { // si mouse está fuera
+    noFill(); // sin relleno
+    stroke(251,224,23); // color amarillo
+    strokeWeight(20); // grosor borde
+    ellipse(
+      width / 2, // posición x
+      height / 2, // posición y
+      10, // ancho
+      10 // alto
+    );
+  }
+
+  //IMAGEN INFERIOR
+if (!mouseDentro && textoActivo) { // si mouse está fuera
+    push(); // guarda configuración
+    let ratioInferior = imagenInferior.width / imagenInferior.height; // calcula proporción
+    let inferiorW = 250; // ancho imagen
+    let inferiorH = inferiorW / ratioInferior; // alto proporcional
+     image(
+      imagenInferior, // imagen
+      width / 2, // posición x
+      height - inferiorH / 2 - 100, // posición y
+      inferiorW, // ancho
+      inferiorH // alto
+    );
+    pop(); // restaura configuración
+  }
+
+  //TEXTO PARPADEANTE
+  if (textoActivo) { // si texto activo
+    if (frameCount % 4 < 2) { // genera parpadeo
+      parpadeoTexto = true; // muestra texto
+    } else {
+      parpadeoTexto = false; // oculta texto
+    }
+    if (mouseDentro) { // si mouse entra
+      if (parpadeoTexto) { // si texto visible
+        push(); // guarda configuración
+        translate(width / 2,height / 2); // mueve origen centro
+        rotate(sin(frameCount * 0.25) * 0.04); // rotación suave
+        let escalaTexto = map(
+          mouseY, // valor original
+          0, // mínimo original
+          height, // máximo original
+          0.92, // mínimo nuevo
+          1.08 // máximo nuevo
+        );
+        scale(escalaTexto); // aplica escala
+        let ratioTexto = textoImg.width / textoImg.height; // calcula proporción
+        let textoW = 340; // ancho texto
+        let textoH = textoW / ratioTexto; // alto proporcional
+        image(
+          textoImg, // imagen
+          0, // posición x
+          0, // posición y
+          textoW, // ancho
+          textoH // alto
+        );
+        pop(); // restaura configuración
+      }
+    }
+  }
+  
+  //CUADRADO DERECHO
+  if (cuadradoVisible && !mujerVisible) { // si cuadrado visible
+    fill(251,224,23); // color amarillo
+    rect(
+      width - 40, // posición x
+      height / 2, // posición y
+      20, // ancho
+      20 // alto
+    );
+
+    let dCuadrado = dist(
+      mouseX, // mouse x
+      mouseY, // mouse y
+      width - 40, // x cuadrado
+      height / 2 // y cuadrado
+    );
+
+    if (dCuadrado < 80) { // si mouse se acerca
+      mujerVisible = true; // muestra mujer
+      cuadradoVisible = false; // oculta cuadrado
+      mensajeVisible = true; // muestra mensaje
+    }
+  }
+
+  //MUJER
+  if (mujerVisible) { // si mujer visible
+    let escalaMujer = map(
+      mouseY, // valor original
+      0, // mínimo original
+      height, // máximo original
+      0.95, // mínimo nuevo
+      1.15 // máximo nuevo
+    );
+    
+    push(); // guarda configuración
+    translate(width / 2,height / 2 + 80); // mueve origen
+    scale(escalaMujer); // aplica escala
+    rotate(sin(frameCount * 0.25) * 0.04); // rotación suave
+    let ratioMujer = mujer.width / mujer.height; // calcula proporción
+    let mujerH = 760; // altura mujer
+    let mujerW = mujerH * ratioMujer; // ancho proporcional
+
+    image(
+      mujer, // imagen
+      0, // posición x
+      0, // posición y
+      mujerW, // ancho
+      mujerH // alto
+    );
+    pop(); // restaura configuración
+    noFill(); // sin relleno
+    stroke(255,100); // borde transparente
+    strokeWeight(2); // grosor borde
+    ellipse(
+      width / 2, // posición x
+      height / 2 - 110, // posición y
+      100, // ancho
+      100 // alto
+    );
+  }
+
+  //TRIÁNGULOS RANDOM
+  if (explotar) { // si explosión activa
+    for (let i = 0; i < 5; i++) { // crea 5 triángulos
+      triangulos.push({
+        x: width / 2 + random(-20,20), // posición x
+        y: height / 2 - 110 + random(-20,20), // posición y
+        tam: random(5,20), // tamaño
+        rot: random(TWO_PI), // rotación,variable que guarda el angulo de giro del triangulo
+        vel: random(12,25), // velocidad
+      });
+    }
+
+    for (let t of triangulos) { // revisa triángulos
+      t.tam += t.vel; // aumenta tamaño
+      let progreso = map(t.tam,0,width * 2,0,1); // crea progreso
+      progreso = constrain(progreso,0,1); // limita valor
+      let r = 255; // rojo fijo
+      let g = lerp(255,220,progreso); // verde cambia
+      let b = lerp(255,0,progreso); // azul desaparece
+      let visible = random() > 0.35; // genera parpadeo
+
+      if (visible) { // si triángulo visible
+        push(); // guarda configuración
+        translate(t.x,t.y); // mueve origen
+        rotate(t.rot); // rota triángulo
+        fill(r,g,b); // aplica color
+        noStroke(); // elimina borde
+        triangle(
+          random(-t.tam,t.tam),//cambia la posición del triangulo, random
+          random(-t.tam,t.tam),//cambia la posición del triangulo, random
+          random(-t.tam,t.tam),//cambia la posición del triangulo, random
+          random(-t.tam,t.tam),//cambia la posición del triangulo, random
+          random(-t.tam,t.tam),//cambia la posición del triangulo, random
+          random(-t.tam,t.tam)//cambia la posición del triangulo, random
+        );
+ pop(); // restaura configuración
+      }
+    }
+  }
+
+  //TEXTOS
+  textSize(12); // tamaño texto
+  textAlign(CENTER); // centra texto
+  fill(255); // color blanco
+  noStroke(); // elimina borde
+
+  if (textoActivo && mouseDentro) { // texto inicial
+    text("CLICK",width / 2,740); // dibuja texto
+  }
+  if (cuadradoVisible && !mujerVisible) { // texto cuadrado
+    text("MOVE CLOSER TO THE SQUARE",width / 2,740); // dibuja texto
+  }
+  if (mujerVisible && !explotar) { // texto cabeza
+    text("CLICK ON THE HEAD",width / 2,740); // dibuja texto
+  }
+  if (mensajeVisible && !explotar) { // mensaje final
+    fill(0); // color negro
+    text(
+      "ENTER MY THOUGHTS AND CLICK",
+      width / 2, //dibuja texto
+      750
+    );
+  }
+}
+
+//CLICK
+function mousePressed() { // se ejecuta al hacer click
+  if (textoActivo) { // si aún está la primera pantalla
+    textoActivo = false; // oculta el texto parpadeante
+    cuadradoVisible = true; // muestra el cuadrado amarillo
+
+    if (!sonido.isPlaying()) { // verifica que el sonido no esté sonando
+      sonido.play(); // reproduce el sonido
+    }
+  }
+
+  else if (mujerVisible) { // si la mujer ya está visible
+    let d = dist( // calcula la distancia entre el mouse y la cabeza
+      mouseX, // posición x del mouse
+      mouseY, // posición y del mouse
+      width / 2, // posición x de la cabeza
+      height / 2 - 110 // posición y de la cabeza
+    );
+
+    if (d < 120) { // si el click fue cerca de la cabeza
+      explotar = true; // activa la explosión de triángulos
+      mensajeVisible = false; // oculta el mensaje inferior
+    }
+  }
+}
+
+//TECLADO
+function keyPressed() { // se ejecuta al presionar una tecla
+  if (key == "r" || key == "R") { // comprueba si la tecla es R
+    reiniciar(); // reinicia toda la experiencia
+  }
+}
+
+//REINICIAR EXPERIENCIA
+function reiniciar() { // devuelve el programa a su estado inicial
+  textoActivo = true; // vuelve a mostrar la pantalla inicial
+  mujerVisible = false; // oculta la imagen de la mujer
+  cuadradoVisible = false; // oculta el cuadrado amarillo
+  mensajeVisible = false; // oculta el mensaje inferior
+  explotar = false; // detiene la explosión
+  triangulos = []; // elimina todos los triángulos creados
+
+  if (sonido.isPlaying()) { // comprueba si el sonido está reproduciéndose
+    sonido.stop(); // detiene el sonido para comenzar desde el inicio al reiniciar
+    //RESPONSIVO
+function windowResized() { // se ejecuta automáticamente cuando cambia el tamaño de la ventana
+  resizeCanvas(windowWidth, windowHeight); // ajusta el canvas al nuevo tamaño de la ventana
+}
+  }
+}
