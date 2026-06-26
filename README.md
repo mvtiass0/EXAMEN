@@ -90,6 +90,9 @@ El objetivo del proyecto es representar de manera interactiva la presión psicol
 ---
 # Link p5.js (https://editor.p5js.org/whomvtiass/sketches/nq6oeUJ6c)
 
+# MAPA DE FLUJO:
+<img width="828" height="1340" alt="IMG_20260626_004941_927" src="https://github.com/user-attachments/assets/755fff63-1712-45b0-afc8-085eadd6a416" />
+
 # CODIGO COMPLETO 
 let textoImg; // guarda imagen del texto
 let mujer; // guarda imagen mujer
