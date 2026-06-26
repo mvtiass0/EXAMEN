@@ -120,8 +120,7 @@ function preload() {
   mujer = loadImage("mujer.png"); // carga imagen mujer
   fondoParpadeo = loadImage("fondo.png"); // carga imagen fondo
   imagenInferior = loadImage("inferior.png"); // carga imagen inferior
-  sonido = loadSound("sonido.mp3"); // cambia el nombre por el de tu archivo
-}
+  sonido = loadSound("sonido.mp3"); // carga sonido
 
 //SETUP
 function setup() {
